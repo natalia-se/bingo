@@ -1,4 +1,4 @@
-export default function Board(bn, i) {
+export default function Board(bn, i, boardRows, boardColumns) {
   let j = 0;
   this.index = i;
   this.numbers = {};
@@ -9,8 +9,8 @@ export default function Board(bn, i) {
   this.isBingo = false;
   bn.forEach((n) => {
     this.numbers[n] = {
-      row: Math.floor(j / 5),
-      column: j % 5,
+      row: Math.floor(j / boardRows),
+      column: j % boardColumns,
     };
     j++;
     this._score += n;
@@ -30,7 +30,8 @@ export default function Board(bn, i) {
       this.columns[column] += 1;
       this._score -= n;
     }
-    this.isBingo = this.rows[row] === 5 || this.columns[column] === 5;
+    this.isBingo =
+      this.rows[row] === boardRows || this.columns[column] === boardColumns;
     this.score = this.isBingo ? this._score * n : 0;
     return result;
   };

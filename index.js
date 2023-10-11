@@ -6,10 +6,16 @@ import Board from "./board.js";
 // ];
 
 // const data = [
+//   3, 15, 0, 2, 22, 9, 18, 13, 17, 5, 19, 8, 7, 25, 23, 20, 11, 10, 24, 4, 14,
+//   21, 16, 12, 6,
+//   //
+//   14, 21, 17, 24, 4, 10, 16, 15, 9, 19, 18, 8, 23, 26, 20, 22, 11, 13, 6, 5, 2,
+//   0, 12, 3, 7,
+//   //
+
 //   22, 13, 17, 11, 0, 8, 2, 23, 4, 24, 21, 9, 14, 16, 7, 6, 10, 3, 18, 5, 1, 12,
-//   20, 15, 19, 3, 15, 0, 2, 22, 9, 18, 13, 17, 5, 19, 8, 7, 25, 23, 20, 11, 10,
-//   24, 4, 14, 21, 16, 12, 6, 14, 21, 17, 24, 4, 10, 16, 15, 9, 19, 18, 8, 23, 26,
-//   20, 22, 11, 13, 6, 5, 2, 0, 12, 3, 7,
+//   20, 15, 19,
+//   //
 // ];
 
 const winNumbers = [
@@ -150,33 +156,45 @@ const data = [
   3, 0, 30, 46, 50, 48, 76, 5,
 ];
 
-let allBoards = [];
-const boards = [];
+const boardRows = 5;
+const boardColumns = 5;
 
-for (let i = 0; i < data.length; i += 25) {
-  const oneBoard = data.slice(i, i + 25);
-  allBoards.push(oneBoard);
-}
-console.log(allBoards[99]);
-
-for (let i = 0; i < allBoards.length; i++) {
-  boards[i] = new Board(allBoards[i], i);
-}
-
-let minScore = 10000;
+let lastScore = 0;
 let winLast = 0;
 
-winNumbers.forEach((n) => {
-  boards.forEach((b) => {
-    const result = b.checkNumber(n);
+const getBoards = (boardRows, boardColumns) => {
+  const boards = [];
+  for (
+    let i = 0, boardIndex = 0;
+    i < data.length;
+    i += boardRows * boardColumns, boardIndex++
+  ) {
+    const oneBoard = data.slice(i, i + boardRows * boardColumns);
 
-    if (result.isBingo) {
-      if (result.score < minScore) {
-        minScore = result.score;
-        winLast = b.index;
-      }
-    }
+    boards[boardIndex] = new Board(
+      oneBoard,
+      boardIndex,
+      boardRows,
+      boardColumns
+    );
+  }
+  return boards;
+};
+
+const playBingo = (winNumbers, boards) => {
+  winNumbers.forEach((n) => {
+    boards
+      .filter((b) => !b.isBingo)
+      .forEach((b) => {
+        b.checkNumber(n);
+        winLast = b.isBingo ? b.index : winLast;
+        lastScore = b.isBingo ? b.score : lastScore;
+      });
   });
-});
+  console.log(`${winLast} board will winn last with a score ${lastScore}`);
+  return lastScore;
+};
 
-console.log(`${winLast + 1} winn last with a score ${minScore}`);
+const boards = getBoards(boardRows, boardColumns);
+
+playBingo(winNumbers, boards);
